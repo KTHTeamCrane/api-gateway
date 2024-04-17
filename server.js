@@ -12,18 +12,15 @@ console.log(apiDomain)
 app.get("/article", async (req, res) => {
     console.log("Request at /article")
     let articleUrl = req.query.article
-    let result = await fetch(apiDomain + "/api/fake?article=" +  articleUrl, {method: "POST"}) 
+
+    // TODO: Send request as a body instead of a parameter
+    const  func = async (_, dat) => {
+        let result = await fetch(apiDomain + "/api/fake?article=" +  dat.content, {method: "POST"}) 
+        console.log(result)
     res.send(JSON.stringify(await result.json())) 
-
-
-
-    // const  func = async (_, dat) => {
-    //     let result = await fetch(apiDomain + "/api/fake?query=" + dat.content)
-    //     res.send(result)
-    // }
-    // let articleUrl = req.query.article
-    // console.log(articleUrl)
-    // extractor.ExtractArticle(articleUrl, func)
+    }
+    console.log(articleUrl)
+    extractor.ExtractArticle(articleUrl, func)
 })
 
 app.listen(port, () => {
