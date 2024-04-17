@@ -1,7 +1,13 @@
 {
-  "dependencies": {
-    "article-extractor": "^1.0.2",
-    "entities": "^4.5.0",
-    "express": "^4.19.2"
-  }
+    "author": ["Kristian Ruth", "Praanto Samadder"],
+    "scripts": {
+        "dev": "nodemon --env-file=.env server.js"
+    },
+    "dependencies": {
+        "@extractus/article-extractor": "^8.0.7",
+        "article-extractor": "^1.0.2",
+        "entities": "^4.5.0",
+        "express": "^4.19.2",
+        "nodemon": "^3.1.0"
+    }
 }

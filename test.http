@@ -1,0 +1,5 @@
+### Request 1
+GET http://127.0.0.1:8000/article?article=Earth is round
+
+### Request 2
+POST http://127.0.0.1:5000/api/fake?article=Donald Trump is the goat of the goat
