@@ -11,14 +11,14 @@ Function: extract article contents and `onSuccess` is called with the data JSON 
               content: String,
               summary: String
             }
-Return type: none
+Return type: void
 */
 module.exports = {
   ExtractArticle: async function(url, onSuccess) {
     extractor.extractData(url, (err, dat) => {
       dat.content = dat.content.replace(/<[^>]*>/g, '')
       dat.content = entities.decodeHTML(dat.content)
-      onSuccess(dat)
+      onSuccess(err, dat)
     })
   }
 }
