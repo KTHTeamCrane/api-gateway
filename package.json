@@ -1,7 +1,9 @@
 {
     "author": ["Kristian Ruth", "Praanto Samadder"],
     "scripts": {
-        "dev": "nodemon --env-file=.env server.js"
+        "dev": "nodemon --env-file=.env server.js",
+        "build": "echo yah actually building",
+        "start": "nodemon --env-file=.env server.js"
     },
     "dependencies": {
         "@extractus/article-extractor": "^8.0.7",

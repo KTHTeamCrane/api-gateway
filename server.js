@@ -34,6 +34,15 @@ app.get("/article", async (req, res) => {
     extractor.ExtractArticle(articleUrl, func)
 })
 
+app.get("/echo", async (req, res) => {
+    res.send(req.body)
+})
+
+app.get("/env-test", async (res, req) => {
+    res.send(process.env.FLASK_API_DOMAIN)
+})
+
+
 app.listen(port, () => {
     console.log("Started server on port " + port)
 })
