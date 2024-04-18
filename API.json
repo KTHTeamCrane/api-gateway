@@ -1,0 +1,26 @@
+{
+    "request": {
+        "web_extension": {
+            "echo": "http://127.0.0.1:8000/echo",
+            "inference": "http://127.0.0.1:8000/article/",
+            "inference_request_type": 
+            "url_param"
+        },
+        "express": {
+            "echo": "http://127.0.0.1:5000/echo",
+            "inference": "http://127.0.0.1:5000/api/fake",
+            "inference_request_type": "body_plain"
+        }
+    },
+    "response": {
+        "web_extension": {
+            "inference_response_type": "json"
+        },
+        "express": {
+            "inference_request_type": "json"
+        },
+        "flask": {
+            "inference_request_type": "json"
+        }
+    }
+}
