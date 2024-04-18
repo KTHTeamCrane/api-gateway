@@ -17,8 +17,17 @@ app.get("/article", async (req, res) => {
     Sanitize(articleUrl)
     // TODO: Send request as a body instead of a parameter
     const  func = async (_, dat) => {
-        let result = await fetch(apiDomain + "/api/fake?article=" +  dat.content, {method: "POST"}) 
+        const result = await fetch(apiDomain, {
+            method: "POST",
+            headers: {
+                "Content-Type":"text/plain"
+            }
+            body: dat.content,
+            port: port
+        })
         console.log(result)
+        // let result = await fetch(apiDomain + "/api/fake?article=" +  dat.content, {method: "POST"}) 
+        // console.log(result)
         res.send(JSON.stringify(await result.json())) 
     }
     console.log(articleUrl)
