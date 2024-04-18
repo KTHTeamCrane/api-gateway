@@ -3,3 +3,10 @@ GET http://127.0.0.1:8000/article?article=https://www.nytimes.com/2024/04/17/wor
 
 ### Request 2
 POST http://127.0.0.1:5000/api/fake?article=Donald Trump is the goat of the goat
+
+
+### Request 3
+GET https://api-gateway-sepia.vercel.app/echo
+Content-Type: text/plain
+
+Hello World
