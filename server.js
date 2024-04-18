@@ -10,6 +10,10 @@ console.log(apiDomain)
 
 function Sanitize(str) { return str.replace(/[^a-z0-9áéíóúñü \.,_-]/gim,"").trim(); }
 
+app.get("/", async (req, res) => {
+    res.send("To fake or not to fake, that is the question")
+})
+
 app.get("/article", async (req, res) => {
     console.log("Request at /article")
     let articleUrl = req.query.article
