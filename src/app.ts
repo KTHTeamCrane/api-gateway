@@ -1,6 +1,8 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import check_text from "./check_text";
+import ep_check_text from "./check_text";
+import ep_check_url from "./check_url";
+import ep_extract from "./extract";
 
 dotenv.config();
 
@@ -21,20 +23,15 @@ Route                   Method      Parameters
 })
 
 app.post("/api/article/checktext", async (req: Request, res: Response) => {
-    await check_text(req, res)
+    await ep_check_text(req, res)
 });
 
-app.post("api/article/checkurl")
-
-app.post("api/article/extract", async (req: Request, res: Response) => {
-    
+app.post("/api/article/checkurl", async (req: Request, res: Response) => {
+    await ep_check_url(req, res)
 })
 
-
-
-
-app.options("", async (req: Request, res: Response) => {
-
+app.post("/api/article/extract", async (req: Request, res: Response) => {
+    await ep_extract(req, res)
 })
 
 app.listen(port, () => {

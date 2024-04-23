@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
+import { log } from "./logger";
 
 // This function should never throw an error to the caller.
-export default async function check_text(req: Request, res: Response) {
+export default async function ep_check_text(req: Request, res: Response) {
     try {
         await fetch_claims_from_llm()
         await fetch_fact_check_from_llm()
         await fetch_fact_check_from_llm()
-    } catch {
-        res.statusCode = 500
+    } catch (e) {
+        log.error(e)
+        res.sendStatus(500)
     }
 }
 

@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import {decodeHTML} from "entities"
 import {ArticleData, extract} from "@extractus/article-extractor"
-import { throws } from "assert";
+import { log } from "./logger";
 
 
 export default async function ep_extract(req: Request, res: Response) {
     try {
-    } catch {
-
+    } catch (e) {
+        log.error(e)
+        res.sendStatus(500)
     }
 }
 

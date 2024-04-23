@@ -18,8 +18,8 @@
     "dotenv": "^16.4.5",
     "entities": "^4.5.0",
     "express": "^4.19.2",
-    "ts-log": "^2.2.5",
     "ts-node": "^10.9.2",
+    "tslog": "^4.9.2",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
