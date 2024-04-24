@@ -1,0 +1,1 @@
+This directory contains files for handling endpoints within the express server.

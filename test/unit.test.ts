@@ -1,4 +1,4 @@
-import unit from "../src/unit";
+import unit from "../src/unit"
 
 describe("testing the unit test lol", () => {
     test("should return 4 since 2 + 2 = 4", () => {
