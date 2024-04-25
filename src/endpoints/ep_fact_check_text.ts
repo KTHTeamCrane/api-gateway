@@ -6,11 +6,12 @@ import retrieval_get_sources from "../api/retrieval_api";
 export default async function ep_fact_check_text(req: Request, res: Response) {
     log.info("Request at /check_text")
     try {
-        let article         = req.body.article
-        let claims          = await llm_get_claims(article)
-        let sources         = await retrieval_get_sources(claims)
-        let finalResponse   = await llm_verify_article_with_sources(article, sources)
-        res.send(finalResponse)
+        const article = req.body.article
+        // const claims = await llm_get_claims(article)
+        // const sources = await retrieval_get_sources(claims)
+        // const finalResponse = await llm_verify_article_with_sources(article, sources)
+        const factCheck = await llm_verify_article_with_sources(article, [])
+        res.send(factCheck)
     } catch (e) {
         log.error(e)
         res.sendStatus(500)
