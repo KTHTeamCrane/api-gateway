@@ -4,7 +4,7 @@ import ep_check_text from "./endpoints/ep_check_text";
 import { log } from "./log";
 
 const app: Express = express();
-const port = process.env.PORT || 8000;
+const port = 8000;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: "50mb" }));
@@ -28,6 +28,7 @@ app.post("/api/article/check-text", async (req: Request, res: Response) => {
     await ep_check_text(req, res)
 });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
+
     log.info(`[server]: Server is running at http://localhost:${port}`);
 });
