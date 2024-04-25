@@ -4,6 +4,7 @@ import ep_fact_check_text from "./endpoints/ep_fact_check_text";
 import { log } from "./log";
 import ep_get_claims from "./endpoints/ep_get_claims";
 import { websocket } from "./api/websocket";
+import ep_extract_fact_check from "./endpoints/ep_extract_fact_check";
 
 const app: Express = express();
 const port = 8000;
@@ -32,6 +33,10 @@ app.post("/api/article/extract", async (req: Request, res: Response) => {
 
 app.post("/api/article/fact-check-text", async (req: Request, res: Response) => {
     await ep_fact_check_text(req, res)
+});
+
+app.post("/api/article/extract-and-fact-check", async (req: Request, res: Response) => {
+    await ep_extract_fact_check(req, res);
 });
 
 app.post("/api/article/get-claims", async (req: Request, res: Response) => {

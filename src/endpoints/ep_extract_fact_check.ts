@@ -1,12 +1,20 @@
 import { extractFromHtml } from "@extractus/article-extractor";
 import { Request, Response } from "express";
 import { log } from "../log";
+import { llm_verify_article_with_sources } from "../api/llm_api";
 
-export default async function ep_extract(req: Request, res: Response) {
-    log.info("Received request at /api/article/extract")
+export default async function ep_extract_fact_check(req: Request, res: Response) {
+    log.info("Received request at /api/article/extract-and-fact-check");
     try {
-        let html = (await article_extract(req.body.article_html)).content
-        res.send(JSON.stringify(html))
+        const article_text = (await article_extract(req.body.article_html)).content;
+
+        if (article_text == null) {
+            res.status(400).send("Article is null");
+            return;
+        }
+
+        const checks = await llm_verify_article_with_sources(article_text, []);
+        res.json(checks);
     } catch (e) {
         console.log(e)
         res.sendStatus(500);
