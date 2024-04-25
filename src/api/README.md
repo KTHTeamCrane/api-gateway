@@ -1,0 +1,1 @@
+This directory contains files for communicating with the LLM API and the Retrieval API

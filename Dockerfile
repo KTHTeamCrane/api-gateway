@@ -1,11 +1,11 @@
-FROM node
+FROM node:latest
 
 EXPOSE 8000
 
-WORKDIR /app
+WORKDIR /server
+
 COPY package.json ./
 RUN npm install
+
 COPY . .
-
-CMD ["node", "--env-file=.env", "server.js"]
-
+CMD ["npm", "run", "dev"]
