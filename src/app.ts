@@ -1,13 +1,19 @@
 import express, { Express, Request, Response } from "express";
 import ep_extract from "./endpoints/ep_extract";
-import ep_check_text from "./endpoints/ep_check_text";
+import ep_fact_check_text from "./endpoints/ep_fact_check_text";
 import { log } from "./log";
+import ep_get_claims from "./endpoints/ep_get_claims";
+import { websocket } from "./api/websocket";
 
 const app: Express = express();
 const port = 8000;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: "50mb" }));
+
+websocket.onopen = () => {
+    log.info("Established connection with LLM-API via websocket.")
+}
 
 app.get("/", async (_: Request, res: Response) => {
     log.info("Request at /")
@@ -24,11 +30,14 @@ app.post("/api/article/extract", async (req: Request, res: Response) => {
     await ep_extract(req, res);
 });
 
-app.post("/api/article/check-text", async (req: Request, res: Response) => {
-    await ep_check_text(req, res)
+app.post("/api/article/fact-check-text", async (req: Request, res: Response) => {
+    await ep_fact_check_text(req, res)
 });
 
-app.listen(port, "0.0.0.0", () => {
+app.post("/api/article/get-claims", async (req: Request, res: Response) => {
+    await ep_get_claims(req, res)
+})
 
-    log.info(`[server]: Server is running at http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+    log.info(`Server is running at http://localhost:${port}`);
 });
