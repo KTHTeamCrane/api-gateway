@@ -36,7 +36,7 @@ export async function llm_verify_article_with_sources(article: string, sources: 
     });
 
     if (factCheckResponse.type === "error") {
-        throw (factCheckResponse as ErrorResponse).body.msg;
+        throw (factCheckResponse as ErrorResponse).body;
     }
 
     return (factCheckResponse as FactCheckResponse).body.factcheck;
@@ -59,7 +59,7 @@ export async function llm_get_claims(article: string): Promise<string[]> {
     });
 
     if (claimResponse.type === "error") {
-        throw (claimResponse as ErrorResponse).body.msg;
+        throw (claimResponse as ErrorResponse).body;
     }
 
     return (claimResponse as ClaimResponse).body.claims;
