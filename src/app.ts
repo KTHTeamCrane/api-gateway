@@ -3,7 +3,6 @@ import ep_extract from "./endpoints/ep_extract";
 import ep_fact_check_text from "./endpoints/ep_fact_check_text";
 import { log } from "./log";
 import ep_get_claims from "./endpoints/ep_get_claims";
-import { websocket } from "./api/websocket";
 import ep_extract_fact_check from "./endpoints/ep_extract_fact_check";
 
 const app: Express = express();
@@ -12,9 +11,6 @@ const port = 8000;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: "50mb" }));
 
-websocket.onopen = () => {
-    log.info("Established connection with LLM-API via websocket.")
-}
 
 app.get("/", async (_: Request, res: Response) => {
     log.info("Request at /")
