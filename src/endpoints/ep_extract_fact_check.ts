@@ -2,7 +2,7 @@ import { extractFromHtml } from "@extractus/article-extractor";
 import { Request, Response } from "express";
 import { log } from "../log";
 import { llm_get_claims, llm_verify_article_with_sources } from "../api/llm_api";
-import { retrieval_get_sources } from "../api/retrieval_api";
+import { retrieval_get_articles, retrieval_get_politifact } from "../api/retrieval_api";
 
 export default async function ep_extract_fact_check(req: Request, res: Response) {
     log.info("Received request at /api/article/extract-and-fact-check");
@@ -15,8 +15,14 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
         }
 
         const claims = await llm_get_claims(article_text);
-        const sources = await retrieval_get_sources(claims);
-        const checks = await llm_verify_article_with_sources(article_text, sources.sources);
+        const politifact_sources = await retrieval_get_politifact(claims);
+        const article_sources = await retrieval_get_articles(article_text);
+        const checks = await llm_verify_article_with_sources(
+            article_text,
+            politifact_sources.sources,
+            article_sources.sources
+        );
+
         res.json(checks);
     } catch (e) {
         console.log(e)

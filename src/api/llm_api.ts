@@ -1,12 +1,12 @@
 import { log } from "../log"
 import fetch from "node-fetch"
-import { SourceEntry } from "../api/retrieval_api"
+import { PolitifactEntry } from "../api/retrieval_api"
 
 interface FactCheck {
     excerpt: string,
     label: "TRUE" | "PARTIAL" | "FALSE",
     reason: string,
-    sources: Record<string, SourceEntry>
+    sources: Record<string, PolitifactEntry>
 }
 
 interface WSMessage<T> {
@@ -31,15 +31,17 @@ async function sendRequest(type: string, body: any) {
     return await response.json();
 }
 
-/**
- * Sends a list of sources and the article to the LLM API to fact check.
- */
-export async function llm_verify_article_with_sources(article: string, sources: Record<string, SourceEntry>): Promise<FactCheck[]> {
+export async function llm_verify_article_with_sources(
+    article: string,
+    fact_sources: Record<string, PolitifactEntry>,
+    article_sources: string[],
+): Promise<FactCheck[]> {
     log.info("Sending get fact check to LLM-API");
 
     const factCheckResponse = await sendRequest("get_factcheck", {
         article: article,
-        sources: sources
+        fact_sources: fact_sources,
+        article_sources: article_sources,
     }) as ErrorResponse | FactCheckResponse;
 
     if (factCheckResponse.type === "error") {
@@ -49,15 +51,6 @@ export async function llm_verify_article_with_sources(article: string, sources: 
     return (factCheckResponse as FactCheckResponse).body.factcheck;
 }
 
-/**
- * Sends an article the LLM API.
- * 
- * The LLM API returns a list of claims that it finds within the article.
- * 
- * The list of claims is then returned.
- * 
- * @returns A list of claims from a given article
- */
 export async function llm_get_claims(article: string): Promise<string[]> {
     log.info("Sending get claims to LLM-API");
 
