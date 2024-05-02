@@ -1,11 +1,12 @@
 import { log } from "../log"
 import fetch from "node-fetch"
+import { SourceEntry } from "../api/retrieval_api"
 
 interface FactCheck {
     excerpt: string,
     label: "TRUE" | "PARTIAL" | "FALSE",
     reason: string,
-    sources: string[]
+    sources: Record<string, SourceEntry>
 }
 
 interface WSMessage<T> {
@@ -33,10 +34,9 @@ async function sendRequest(type: string, body: any) {
 /**
  * Sends a list of sources and the article to the LLM API to fact check.
  */
-export async function llm_verify_article_with_sources(article: string, sources: string[]): Promise<FactCheck[]> {
+export async function llm_verify_article_with_sources(article: string, sources: Record<string, SourceEntry>): Promise<FactCheck[]> {
     log.info("Sending get fact check to LLM-API");
 
-    // const factCheckReq = fetch("")
     const factCheckResponse = await sendRequest("get_factcheck", {
         article: article,
         sources: sources
