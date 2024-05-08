@@ -1,3 +1,5 @@
+import { log } from "../log";
+
 async function sendRetrievalRequest(path: string, body: any) {
     // const API_URL = `http://localhost:6970`;
     const API_URL = `https://retrieval-api-slixmjmf2a-ez.a.run.app`;
@@ -54,6 +56,7 @@ interface GetSourcesError {
 
 export async function retrieval_get_politifact(claims: string[]): Promise<GetPolitifactResponse> {
     const reqBody: GetPolitifactSourcesRequest = { claims };
+    log.info("Sending data to the retrieval API")
     const response = await sendRetrievalRequest("api/politifact", reqBody) as GetPolitifactResponse | GetSourcesError;
 
     if ("error" in response) throw new Error(response.error);
@@ -67,11 +70,12 @@ export async function retrieval_get_articles(
     refArticleURL: string,
     checkClaim?: string,
 ): Promise<GetArticlesResponse> {
-    const reqBody: GetArticleSourcesRequest = {
+    const reqBody  = {
         title: refArticleTitle,
         url: refArticleURL,
         article: refArticle,
         claim: checkClaim,
+        search_engine: "google"
     };
     const response = await sendRetrievalRequest("api/articles", reqBody) as GetArticlesResponse | GetSourcesError;
 

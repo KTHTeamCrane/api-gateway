@@ -27,7 +27,7 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
             const sources = await retrieval_get_articles(
                 article_text,
                 // Gonna try using just the first 30 characters of the claim to get better search results
-                req.body.article_title.substring(0, 30),
+                req.body.article_title,
                 req.body.article_url,
                 claim.claim.substring(0, 30)
             );

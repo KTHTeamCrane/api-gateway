@@ -32,24 +32,31 @@ async function sendRequest(type: string, body: any) {
     return await response.json();
 }
 
-export async function llm_verify_article_with_sources(
+export async function llm_verify_single_claim(
     article: string,
-    fact_sources: Record<string, PolitifactEntry>,
+    fact_sources: PolitifactEntry[],
     article_sources: string[],
 ): Promise<FactCheck[]> {
     log.info("Sending get fact check to LLM-API");
 
-    const factCheckResponse = await sendRequest("get_factcheck", {
-        article: article,
-        fact_sources: fact_sources,
-        article_sources: article_sources,
+    const politifact_sources: Record<string, PolitifactEntry[]> = {};
+    politifact_sources[article] = fact_sources;
+
+    const sources: Record<string, string[]> = {};
+    sources[article] = article_sources;
+
+    const claims = [{ claim: article, excerpt: article }]
+    const factCheckResponse = await sendRequest("get_factcheck_with_claims", {
+        article, politifact_sources, article_sources: sources, claims
     }) as ErrorResponse | FactCheckResponse;
 
     if (factCheckResponse.type === "error") {
         throw (factCheckResponse as ErrorResponse).body;
     }
 
-    return (factCheckResponse as FactCheckResponse).body.factcheck;
+    if ((factCheckResponse as FactCheckResponse).body.factcheck.length <= 0) throw new Error("Fact verification didn't work because no elements were received from LLM-API.")
+
+    return (factCheckResponse as FactCheckResponse).body.factcheck[0];
 }
 
 export async function llm_verify_article_with_sources_multirun(
