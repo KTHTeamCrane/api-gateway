@@ -5,9 +5,7 @@ async function sendRetrievalRequest(path: string, body: any) {
     const API_URL = `https://retrieval-api-slixmjmf2a-ez.a.run.app`;
     const response = await fetch(`${API_URL}/${path}`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
     });
 
@@ -35,11 +33,14 @@ export interface PolitifactEntry {
     body: string
     score: number
     label: string
+    url: string
 }
 
 export interface ArticleEntry {
     body: string
-    score: number
+    url: string
+    title: string
+    publisher: string
 }
 
 interface GetPolitifactResponse {
@@ -47,7 +48,7 @@ interface GetPolitifactResponse {
 }
 
 interface GetArticlesResponse {
-    sources: string[]
+    sources: ArticleEntry[]
 }
 
 interface GetSourcesError {
@@ -70,7 +71,7 @@ export async function retrieval_get_articles(
     refArticleURL: string,
     checkClaim?: string,
 ): Promise<GetArticlesResponse> {
-    const reqBody  = {
+    const reqBody = {
         title: refArticleTitle,
         url: refArticleURL,
         article: refArticle,

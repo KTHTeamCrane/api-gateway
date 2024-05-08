@@ -1,12 +1,24 @@
 import { log } from "../log"
 import fetch from "node-fetch"
-import { PolitifactEntry } from "../api/retrieval_api"
+import { ArticleEntry, PolitifactEntry } from "../api/retrieval_api"
+
+interface FactSource {
+    type: "ARTICLE" | "POLITIFACT" | "UNKNOWN"
+    source_idx: number
+    raw: string
+
+    // Injected later. This is super stupid.
+    source_title?: string,
+    source_publisher?: string,
+    url?: string
+}
 
 interface FactCheck {
     EXCERPT: string,
-    LABEL: "TRUE" | "PARTIAL" | "FALSE",
+    LABEL: "TRUE" | "PARTIALLY TRUE" | "FALSE",
     EXPLANATION: string,
-    SOURCES: string[]
+    SOURCES: FactSource[],
+    CLAIM: string
 }
 
 interface WSMessage<T> {
@@ -36,7 +48,7 @@ export async function llm_verify_single_claim(
     article: string,
     fact_sources: PolitifactEntry[],
     article_sources: string[],
-): Promise<FactCheck[]> {
+): Promise<FactCheck> {
     log.info("Sending get fact check to LLM-API");
 
     const politifact_sources: Record<string, PolitifactEntry[]> = {};
@@ -63,7 +75,7 @@ export async function llm_verify_article_with_sources_multirun(
     article: string,
     claims: { claim: string, excerpt: string }[],
     politifact_sources: Record<string, PolitifactEntry[]>,
-    article_sources: Record<string, string[]>,
+    article_sources: Record<string, ArticleEntry[]>,
 ): Promise<FactCheck[]> {
     log.info("Sending get fact check to LLM-API");
 

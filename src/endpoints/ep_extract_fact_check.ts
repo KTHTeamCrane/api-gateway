@@ -5,7 +5,7 @@ import {
     llm_get_claims_with_excerpts,
     llm_verify_article_with_sources_multirun
 } from "../api/llm_api";
-import { retrieval_get_articles, retrieval_get_politifact } from "../api/retrieval_api";
+import { ArticleEntry, retrieval_get_articles, retrieval_get_politifact } from "../api/retrieval_api";
 
 export default async function ep_extract_fact_check(req: Request, res: Response) {
     log.info("Received request at /api/article/extract-and-fact-check");
@@ -18,8 +18,8 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
         }
 
         const claims = await llm_get_claims_with_excerpts(article_text);
-        const politifact_sources = await retrieval_get_politifact(claims.map((c) => c.claim));
-        const article_sources: Record<string, string[]> = {}
+        const politifactSources = await retrieval_get_politifact(claims.map((c) => c.claim));
+        const articleSources: Record<string, ArticleEntry[]> = {}
 
         for (const claim of claims) {
             const sources = await retrieval_get_articles(
@@ -29,15 +29,45 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
                 req.body.article_url,
                 claim.claim.substring(0, 30)
             );
-            article_sources[claim.claim] = sources.sources;
+            articleSources[claim.claim] = sources.sources;
         }
 
         const checks = await llm_verify_article_with_sources_multirun(
             article_text,
             claims,
-            politifact_sources.sources,
-            article_sources,
+            politifactSources.sources,
+            articleSources,
         );
+
+        // Insert the corresponding article sources into the checks
+        for (const check of checks) {
+            const checkArticleSources = articleSources[check.CLAIM];
+            const checkPolitifactSources = politifactSources.sources[check.CLAIM];
+
+            for (const src of check.SOURCES) {
+                if (src.type === "ARTICLE") {
+                    const articleSource = checkArticleSources[src.source_idx]
+
+                    if (articleSource) {
+                        src.source_title = articleSource.title;
+                        src.source_publisher = articleSource.publisher;
+                        src.url = articleSource.url;
+                    } else {
+                        log.warn(`Could not find article source for ${check.CLAIM}. (Index: ${src.source_idx})`);
+                    }
+                } else if (src.type === "POLITIFACT") {
+                    const politifactSource = checkPolitifactSources[src.source_idx];
+
+                    if (politifactSource) {
+                        src.source_title = politifactSource.body;
+                        src.source_publisher = "Politifact";
+                        src.url = politifactSource.url;
+                    } else {
+                        log.warn(`Could not find politifact source for ${check.CLAIM}. (Index: ${src.source_idx})`);
+                    }
+                }
+            }
+        }
 
         res.json(checks);
     } catch (e) {
