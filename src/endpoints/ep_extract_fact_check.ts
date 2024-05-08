@@ -1,7 +1,12 @@
 import { extractFromHtml } from "@extractus/article-extractor";
 import { Request, Response } from "express";
 import { log } from "../log";
-import { llm_get_claims, llm_verify_article_with_sources } from "../api/llm_api";
+import {
+    llm_get_claims,
+    llm_get_claims_with_excerpts,
+    llm_verify_article_with_sources,
+    llm_verify_article_with_sources_multirun
+} from "../api/llm_api";
 import { retrieval_get_articles, retrieval_get_politifact } from "../api/retrieval_api";
 
 export default async function ep_extract_fact_check(req: Request, res: Response) {
@@ -14,13 +19,26 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
             return;
         }
 
-        const claims = await llm_get_claims(article_text);
-        const politifact_sources = await retrieval_get_politifact(claims);
-        const article_sources = await retrieval_get_articles(article_text);
-        const checks = await llm_verify_article_with_sources(
+        const claims = await llm_get_claims_with_excerpts(article_text);
+        const politifact_sources = await retrieval_get_politifact(claims.map((c) => c.claim));
+        const article_sources: Record<string, string[]> = {}
+
+        for (const claim of claims) {
+            const sources = await retrieval_get_articles(
+                article_text,
+                // Gonna try using just the first 30 characters of the claim to get better search results
+                req.body.article_title.substring(0, 30),
+                req.body.article_url,
+                claim.claim.substring(0, 30)
+            );
+            article_sources[claim.claim] = sources.sources;
+        }
+
+        const checks = await llm_verify_article_with_sources_multirun(
             article_text,
+            claims,
             politifact_sources.sources,
-            article_sources.sources
+            article_sources,
         );
 
         res.json(checks);
@@ -31,11 +49,6 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
 }
 
 // TODO: Write tests for this function
-// One way to test the article would be to download a number of HTML files and load it using
-// the fs library in Node.
-// Then extracting the article and checking if the returned result has
-//   - any HTML tags
-//   - has a content length of 100 characters
 export async function article_extract(articleHTML: string) {
     let article = await extractFromHtml(articleHTML);
     if (article == null) throw "Article is null"

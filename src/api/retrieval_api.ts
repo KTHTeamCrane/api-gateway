@@ -1,6 +1,7 @@
 async function sendRetrievalRequest(path: string, body: any) {
-    const API_URL = `http://localhost:6970/${path}`;
-    const response = await fetch(API_URL, {
+    // const API_URL = `http://localhost:6970`;
+    const API_URL = `https://retrieval-api-slixmjmf2a-ez.a.run.app`;
+    const response = await fetch(`${API_URL}/${path}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -17,8 +18,15 @@ async function sendRetrievalRequest(path: string, body: any) {
     return json;
 }
 
-interface GetSourcesRequest {
+interface GetPolitifactSourcesRequest {
     claims: string[]
+}
+
+interface GetArticleSourcesRequest {
+    title: string
+    url: string
+    article: string
+    claim?: string
 }
 
 export interface PolitifactEntry {
@@ -33,7 +41,7 @@ export interface ArticleEntry {
 }
 
 interface GetPolitifactResponse {
-    sources: Record<string, PolitifactEntry>
+    sources: Record<string, PolitifactEntry[]>
 }
 
 interface GetArticlesResponse {
@@ -44,22 +52,30 @@ interface GetSourcesError {
     error: string
 }
 
-export async function retrieval_get_politifact(claim: string[]): Promise<GetPolitifactResponse> {
-    const response = await sendRetrievalRequest("api/politifact", { claims: claim }) as GetPolitifactResponse | GetSourcesError;
+export async function retrieval_get_politifact(claims: string[]): Promise<GetPolitifactResponse> {
+    const reqBody: GetPolitifactSourcesRequest = { claims };
+    const response = await sendRetrievalRequest("api/politifact", reqBody) as GetPolitifactResponse | GetSourcesError;
 
-    if ("error" in response) {
-        throw new Error(response.error);
-    }
+    if ("error" in response) throw new Error(response.error);
 
     return response;
 }
 
-export async function retrieval_get_articles(refArticle: string): Promise<GetArticlesResponse> {
-    const response = await sendRetrievalRequest("api/articles", { article: refArticle }) as GetArticlesResponse | GetSourcesError;
+export async function retrieval_get_articles(
+    refArticle: string,
+    refArticleTitle: string,
+    refArticleURL: string,
+    checkClaim?: string,
+): Promise<GetArticlesResponse> {
+    const reqBody: GetArticleSourcesRequest = {
+        title: refArticleTitle,
+        url: refArticleURL,
+        article: refArticle,
+        claim: checkClaim,
+    };
+    const response = await sendRetrievalRequest("api/articles", reqBody) as GetArticlesResponse | GetSourcesError;
 
-    if ("error" in response) {
-        throw new Error(response.error);
-    }
+    if ("error" in response) throw new Error(response.error);
 
     return response;
 }
