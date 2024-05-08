@@ -4,6 +4,7 @@ import ep_fact_check_text from "./endpoints/ep_fact_check_text";
 import { log } from "./log";
 import ep_get_claims from "./endpoints/ep_get_claims";
 import ep_extract_fact_check from "./endpoints/ep_extract_fact_check";
+import ep_fetchnews from "./endpoints/ep_fetchnews";
 
 const app: Express = express();
 const port = 8000;
@@ -24,37 +25,7 @@ Route                       Method      Parameters
 });
 
 app.get('/fetchnews/:country', async (req, res) => {
-    // const country = req.url.replace("/fetchnews/", "").replaceAll("%20", " ")
-    const country = req.params.country;
-  
-    // Set cors headers
-    //   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:1002')
-    //   res.setHeader('Access-Control-Allow-Methods', 'GET')
-    //   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')
-  
-    let date = new Date()
-    let year = date.getFullYear(), month = date.getMonth() + 1, day = date.getDate()
-    date.setDate(date.getDate() - 7);
-    
-    let dayStr, monthStr, yearStr;
-    dayStr = `${day}`
-    monthStr = `${month}`
-    yearStr = `${year}`
-
-    if (day < 10) dayStr = `0${day}`
-    if (month < 10) monthStr = `0${month}`
-    console.log(`Since ${yearStr}-${monthStr}-${dayStr}`)
-    console.log(country)
-    
-    const url = 'https://newsapi.org/v2/everything?' +
-            `q=${country}&` +
-            `from=${yearStr}-${monthStr}-${dayStr}&sortBy=publishedAt&` +
-            'apiKey=' + '2546a9a33a3e464ca8d5887df53c14d6'
-    console.log(url)
-    const newsReq = new Request(url)
-    const newsRes = await fetch(newsReq)
-    const json = newsRes.json()
-    res.json(json);
+    await ep_fetchnews(req, res);
 })
 
 app.post("/api/article/extract", async (req: Request, res: Response) => {
