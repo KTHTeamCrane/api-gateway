@@ -2,9 +2,7 @@ import { extractFromHtml } from "@extractus/article-extractor";
 import { Request, Response } from "express";
 import { log } from "../log";
 import {
-    llm_get_claims,
     llm_get_claims_with_excerpts,
-    llm_verify_article_with_sources,
     llm_verify_article_with_sources_multirun
 } from "../api/llm_api";
 import { retrieval_get_articles, retrieval_get_politifact } from "../api/retrieval_api";
