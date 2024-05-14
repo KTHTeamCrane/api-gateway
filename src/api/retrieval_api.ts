@@ -18,6 +18,35 @@ async function sendRetrievalRequest(path: string, body: any) {
     return json;
 }
 
+async function sendProxyRetrievalRequest(
+    path: "api/politifact" | "api/articles",
+    body: GetArticleSourcesRequest | GetPolitifactSourcesRequest
+) {
+    let type: string;
+
+    if (path == "api/politifact") {
+        type = "get_politifact_sources";
+    } else if (path == "api/articles") {
+        type = "get_article_sources";
+    } else {
+        throw new Error(`Invalid path: ${path}`);
+    }
+
+    const API_URL = "https://llm-proxy-server-slixmjmf2a-ez.a.run.app/proxy";
+    const response = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            id: Math.random().toString(36).substring(7),
+            type: type,
+            body: body
+        })
+    });
+
+    const respJson = await response.json();
+
+    return respJson.body;
+}
+
 interface GetPolitifactSourcesRequest {
     claims: string[]
 }
@@ -27,6 +56,8 @@ interface GetArticleSourcesRequest {
     url: string
     article: string
     claim?: string
+    search_engine?: string
+    limit_articles?: number
 }
 
 export interface PolitifactEntry {
@@ -58,7 +89,7 @@ interface GetSourcesError {
 export async function retrieval_get_politifact(claims: string[]): Promise<GetPolitifactResponse> {
     const reqBody: GetPolitifactSourcesRequest = { claims };
     log.info("Sending data to the retrieval API")
-    const response = await sendRetrievalRequest("api/politifact", reqBody) as GetPolitifactResponse | GetSourcesError;
+    const response = await sendProxyRetrievalRequest("api/politifact", reqBody) as GetPolitifactResponse | GetSourcesError;
 
     if ("error" in response) throw new Error(response.error);
 
@@ -78,7 +109,7 @@ export async function retrieval_get_articles(
         claim: checkClaim,
         // search_engine: "google"
     };
-    const response = await sendRetrievalRequest("api/articles", reqBody) as GetArticlesResponse | GetSourcesError;
+    const response = await sendProxyRetrievalRequest("api/articles", reqBody) as GetArticlesResponse | GetSourcesError;
 
     if ("error" in response) throw new Error(response.error);
 
