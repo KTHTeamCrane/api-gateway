@@ -3,7 +3,8 @@ import { Request, Response } from "express";
 import { log } from "../log";
 import {
     llm_get_claims_with_excerpts,
-    llm_verify_article_with_sources_multirun
+    llm_verify_article_with_sources_multirun,
+    parseArticleSources
 } from "../api/llm_api";
 import { ArticleEntry, retrieval_get_articles, retrieval_get_politifact } from "../api/retrieval_api";
 
@@ -39,35 +40,7 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
             articleSources,
         );
 
-        // Insert the corresponding article sources into the checks
-        for (const check of checks) {
-            const checkArticleSources = articleSources[check.CLAIM];
-            const checkPolitifactSources = politifactSources.sources[check.CLAIM];
-
-            for (const src of check.SOURCES) {
-                if (src.type === "ARTICLE") {
-                    const articleSource = checkArticleSources[src.source_idx]
-
-                    if (articleSource) {
-                        src.source_title = articleSource.title;
-                        src.source_publisher = articleSource.publisher;
-                        src.url = articleSource.url;
-                    } else {
-                        log.warn(`Could not find article source for ${check.CLAIM}. (Index: ${src.source_idx})`);
-                    }
-                } else if (src.type === "POLITIFACT") {
-                    const politifactSource = checkPolitifactSources[src.source_idx];
-
-                    if (politifactSource) {
-                        src.source_title = politifactSource.body;
-                        src.source_publisher = "Politifact";
-                        src.url = politifactSource.url;
-                    } else {
-                        log.warn(`Could not find politifact source for ${check.CLAIM}. (Index: ${src.source_idx})`);
-                    }
-                }
-            }
-        }
+        parseArticleSources(checks, articleSources, politifactSources.sources);
 
         res.json(checks);
     } catch (e) {

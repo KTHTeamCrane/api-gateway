@@ -117,3 +117,39 @@ export async function llm_get_claims_with_excerpts(article: string): Promise<{ c
 
     return (claimResponse as ClaimWithExcerptResponse).body.claims;
 }
+
+export function parseArticleSources(
+    checks: FactCheck[],
+    articleSources: Record<string, ArticleEntry[]>,
+    politifactSources: Record<string, PolitifactEntry[]>
+) {
+    // Insert the corresponding article sources into the checks
+    for (const check of checks) {
+        const checkArticleSources = articleSources[check.CLAIM];
+        const checkPolitifactSources = politifactSources[check.CLAIM];
+
+        for (const src of check.SOURCES) {
+            if (src.type === "ARTICLE") {
+                const articleSource = checkArticleSources[src.source_idx]
+
+                if (articleSource) {
+                    src.source_title = articleSource.title;
+                    src.source_publisher = articleSource.publisher;
+                    src.url = articleSource.url;
+                } else {
+                    log.warn(`Could not find article source for ${check.CLAIM}. (Index: ${src.source_idx})`);
+                }
+            } else if (src.type === "POLITIFACT") {
+                const politifactSource = checkPolitifactSources[src.source_idx];
+
+                if (politifactSource) {
+                    src.source_title = politifactSource.body;
+                    src.source_publisher = "Politifact";
+                    src.url = politifactSource.url;
+                } else {
+                    log.warn(`Could not find politifact source for ${check.CLAIM}. (Index: ${src.source_idx})`);
+                }
+            }
+        }
+    }
+}

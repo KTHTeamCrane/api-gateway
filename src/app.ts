@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json({ limit: "50mb" }));
 
 const corsOptions = {
-    origin: ['https://litmusnews.se', 'http://litmusnews.se', 'https://kthteamcrane.github.io']
+    origin: ['https://litmusnews.se', 'http://litmusnews.se', 'https://kthteamcrane.github.io', 'http://localhost:3000']
 }
 app.use(cors(corsOptions));
 
