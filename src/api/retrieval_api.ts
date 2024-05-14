@@ -76,7 +76,7 @@ export async function retrieval_get_articles(
         url: refArticleURL,
         article: refArticle,
         claim: checkClaim,
-        search_engine: "google"
+        // search_engine: "google"
     };
     const response = await sendRetrievalRequest("api/articles", reqBody) as GetArticlesResponse | GetSourcesError;
 

@@ -72,7 +72,7 @@ export default async function ep_extract_fact_check(req: Request, res: Response)
         res.json(checks);
     } catch (e) {
         console.log(e)
-        res.sendStatus(500);
+        res.status(500).send(e);
     }
 }
 

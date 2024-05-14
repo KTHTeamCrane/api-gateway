@@ -9,7 +9,7 @@ export default async function ep_extract(req: Request, res: Response) {
         res.send(JSON.stringify(html))
     } catch (e) {
         console.log(e)
-        res.sendStatus(500);
+        res.status(500).send(e);
     }
 }
 

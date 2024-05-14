@@ -10,6 +10,6 @@ export default async function ep_get_claims(req: Request, res: Response) {
         res.send(claims)
     } catch (e) {
         log.error(e)
-        res.sendStatus(500)
+        res.status(500).send(e)
     }
 }

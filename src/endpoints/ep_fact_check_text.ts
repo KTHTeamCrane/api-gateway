@@ -16,6 +16,6 @@ export default async function ep_fact_check_text(req: Request, res: Response) {
         res.send(factCheck)
     } catch (e) {
         log.error(e)
-        res.sendStatus(500)
+        res.status(500).send(e)
     }
 }
